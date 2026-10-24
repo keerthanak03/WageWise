@@ -17,10 +17,16 @@ Factory supervisors working with Tamil-speaking and Hindi-speaking migrant worke
 
 To address this challenge, I am testing multilingual embedding models and query translation techniques. I will compare their retrieval quality using questions in Tamil, Hindi, and English to determine which approach finds the most relevant legal provisions. My goal is to provide useful, source-grounded answers regardless of the language used by the user.>
 
+
 ## Dataset
-| Source | Link | Documents | Pages | Licence / terms |
+| Source | Link | Documents / Data Collected | Pages | Licence / Terms |
 |---|---|---|---|---|
-| <Ministry of Labour and Employment, Government of India> | <https://labour.gov.in/> | <Code on Wages, Industrial Relations Code, Code on Social Security, OSH Code, Central Rules, and Ministry notifications> | <Target: 800+ pages> | <Verify the reuse and redistribution terms for each document> |
+| Ministry of Labour and Employment, Government of India | https://www.labour.gov.in/ | Official ministry website | Not applicable | Verify website terms |
+| Guidelines | https://www.labour.gov.in/documents/guidelines?page=1 | Labour guidelines and related resources | To be measured | Verify individual document terms |
+| Labour Codes | https://www.labour.gov.in/offerings/schemes-and-services/details/labour-codes-gzNzQzMtQWa | Labour codes and related resources | To be measured | Verify individual document terms |
+| Publications | https://www.labour.gov.in/documents/publications?page=1 | Ministry publications and reports | To be measured | Verify individual document terms |
+| Gazette Notifications | https://www.labour.gov.in/documents/gazettes-notifications?page=1 | Official labour-related gazette notifications | To be measured | Verify individual document terms |
+
 
 
 
