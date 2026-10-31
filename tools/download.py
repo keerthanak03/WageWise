@@ -3,13 +3,12 @@
 
 import csv
 import hashlib
-import os
 import re
 import sys
 import time
 from datetime import date
 from pathlib import Path
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
 from urllib.robotparser import RobotFileParser
 
 import requests
