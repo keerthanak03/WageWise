@@ -1,13 +1,45 @@
-name: CI
-on: [push, pull_request]
+name: WageWise CI
+
+on:
+  push:
+  pull_request:
+
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: wagewise
+          POSTGRES_PASSWORD: wagewise123
+          POSTGRES_DB: wagewise
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U wagewise -d wagewise"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://wagewise:wagewise123@localhost:5432/wagewise
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Download project code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r requirements-dev.txt
-      - run: ruff check .
-      - run: pytest -q
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run automated tests
+        run: |
+          python -m pytest -v
