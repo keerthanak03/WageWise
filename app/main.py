@@ -5,6 +5,9 @@ from app.usage_tracker import record_usage, get_usage
 from fastapi.responses import StreamingResponse
 from app.llm_service import generate_answer_stream
 
+from app.retrieval import retrieve_chunks
+from app.llm_service import generate_rag_answer
+
 import uuid
 
 from fastapi import HTTPException
@@ -82,3 +85,51 @@ async def chat_stream(request: ChatRequest):
 @app.get("/usage")
 def usage():
     return get_usage()
+
+@app.post("/ask", response_model=ChatResponse)
+async def ask(request: ChatRequest):
+    try:
+        # Step 1: Retrieve relevant document chunks
+        chunks = retrieve_chunks(request.question)
+
+        if not chunks:
+            raise HTTPException(
+                status_code=404,
+                detail="No relevant information found in the documents."
+            )
+
+        # Step 2: Generate an evidence-based answer
+        result = await generate_rag_answer(
+            request.question,
+            request.language,
+            chunks
+        )
+
+        # Step 3: Prepare page-level citations
+        citations = list(dict.fromkeys(
+            f"{item['source_file']} - Page {item['page_number']}"
+            for item in chunks
+        ))
+
+        # Step 4: Record usage
+        record_usage(result.get("usage", {}))
+
+        # Step 5: Return answer and citations
+        return ChatResponse(
+            answer=result["answer"],
+            language=request.language,
+            citations=citations,
+            model=result["model"],
+            request_id=str(uuid.uuid4())
+        )
+
+    except HTTPException:
+        raise
+
+    except Exception as error:
+        print(f"RAG error: {type(error).__name__}: {error}")
+
+        raise HTTPException(
+            status_code=503,
+            detail="WageWise RAG service is temporarily unavailable."
+        )

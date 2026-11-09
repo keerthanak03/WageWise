@@ -54,3 +54,67 @@ curl localhost:8000/health
 
 ## Live link
 <Added in Week 2>
+
+## Week 3 – RAG Pipeline and Evaluation
+
+### Implementation
+
+Implemented a Retrieval-Augmented Generation (RAG) pipeline to answer Indian labour-law questions using official PDF documents.
+
+### Technologies Used
+
+- Python
+- FastAPI
+- PostgreSQL
+- pgvector
+- Sentence Transformers (MiniLM)
+- PyMuPDF
+- Ollama – Mistral LLM
+
+### Dataset Processing
+
+- PDF documents processed: 10
+- Total chunks generated: 2,205
+- Searchable pages indexed: 611
+- Chunk size: 1,000 characters
+- Chunk overlap: 150 characters
+- Embedding dimension: 384
+
+PDF documents were extracted page by page, divided into smaller chunks, converted into embeddings, and stored in PostgreSQL using pgvector.
+
+### RAG API
+
+Implemented the POST /ask endpoint.
+
+The endpoint performs the following steps:
+
+1. Accepts a user question.
+2. Converts the question into an embedding.
+3. Retrieves relevant document chunks from pgvector.
+4. Sends the retrieved context to the local Mistral model through Ollama.
+5. Generates an answer with page-level citations.
+
+### Evaluation
+
+Tested the /ask endpoint with 10 labour-law questions covering:
+
+- Minimum wages
+- Wage deductions
+- Salary payment deadlines
+- Overtime wages
+- Provident Fund (PF)
+- Annual leave
+- Factory accident benefits
+- Health, safety, and welfare
+- Contract labour
+- Tiruppur minimum wages and special allowance
+
+All 10 API requests completed successfully and returned answers with citations.
+
+Some answers require further improvement in retrieval accuracy, completeness, and updated legal information.
+
+### Evaluation Report
+
+Detailed evaluation results are available in:
+
+docs/EVAL_v0.md
