@@ -102,3 +102,62 @@ async def generate_answer_stream(question: str, language: str):
 
         if content:
             yield content
+
+
+async def generate_rag_answer(question: str, language: str, retrieved_chunks: list):
+    """Generate an answer using retrieved document evidence."""
+
+    # Use only the 3 most relevant chunks to reduce processing time.
+    context_parts = []
+
+    for item in retrieved_chunks[:3]:
+        context_parts.append(
+            f"Source: {item['source_file']}, "
+            f"Page: {item['page_number']}\n"
+            f"Content: {item['content'][:700]}"
+        )
+
+    context = "\n\n".join(context_parts)
+
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are WageWise, an Indian labour-law assistant. "
+                "Answer using the supplied document evidence only. "
+                "Do not invent legal provisions or citations. "
+                "If evidence is insufficient, say so. "
+                "Answer clearly in the requested language."
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Language: {language}\n"
+                f"Question: {question}\n\n"
+                f"Document evidence:\n{context}\n\n"
+                "Give a concise answer based on the evidence."
+            ),
+        },
+    ]
+
+    response = await asyncio.wait_for(
+        client.chat(
+            model=MODEL,
+            messages=messages,
+            options={
+                "num_ctx": 2048,
+                "num_predict": 180,
+            },
+        ),
+        timeout=300,
+    )
+
+    return {
+        "answer": response.message.content or "",
+        "model": response.model,
+        "usage": {
+            "prompt_tokens": response.prompt_eval_count,
+            "completion_tokens": response.eval_count,
+        },
+    }
